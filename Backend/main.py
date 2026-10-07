@@ -3,7 +3,7 @@ import json
 import re
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -46,8 +46,12 @@ def refresh_state():
         )
 
 
-# Create FastAPI application (refresh_state runs before every route)
-app = FastAPI(dependencies=[Depends(refresh_state)])
+# Create FastAPI application
+app = FastAPI()
+
+# All real routes live under /api, because Vercel's vercel.json
+# only forwards paths matching /api/(.*) to this backend service.
+router = APIRouter(prefix="/api", dependencies=[Depends(refresh_state)])
 
 
 # Allowed frontend origins.
@@ -277,12 +281,12 @@ def create_user(name, email, age):
 
 # ---------------- Basic routes ----------------
 
-@app.get("/")
+@router.get("/")
 def root():
     return {"message": "FastAPI backend is working"}
 
 
-@app.get("/test")
+@router.get("/test")
 def test():
     return {"message": "React can connect to FastAPI"}
 
@@ -290,13 +294,13 @@ def test():
 # ---------------- Normal CRUD routes ----------------
 
 # Get all users
-@app.get("/users")
+@router.get("/users")
 def get_users():
     return users
 
 
 # Create a user
-@app.post("/users")
+@router.post("/users")
 def add_user(user: UserCreate):
     error = (
         check_name(user.name)
@@ -316,7 +320,7 @@ def add_user(user: UserCreate):
 
 
 # Update a user
-@app.put("/users/{user_id}")
+@router.put("/users/{user_id}")
 def update_user(user_id: int, changes: UserUpdate):
     user = find_user_by_id(user_id)
 
@@ -365,7 +369,7 @@ def update_user(user_id: int, changes: UserUpdate):
 
 
 # Delete a user
-@app.delete("/users/{user_id}")
+@router.delete("/users/{user_id}")
 def delete_user(user_id: int):
     user = find_user_by_id(user_id)
 
@@ -383,7 +387,7 @@ def delete_user(user_id: int):
 
 # ---------------- AI command route ----------------
 
-@app.post("/command")
+@router.post("/command")
 def command(request: CommandRequest):
 
     # Ask the LLM to understand the command
@@ -532,3 +536,7 @@ def command(request: CommandRequest):
         "message": "Unsupported CRUD action.",
         "action": action
     }
+
+
+# Mount all /api routes onto the app
+app.include_router(router)
