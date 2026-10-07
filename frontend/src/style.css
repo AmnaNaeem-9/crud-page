@@ -90,3 +90,37 @@ p {
   color: #777;
   margin-top: 25px;
 }
+.command-box {
+  margin-top: 40px;
+  padding-top: 25px;
+  border-top: 1px solid #ddd;
+}
+
+.command-box h2 {
+  margin-bottom: 15px;
+}
+
+.command-box input {
+  width: 70%;
+  margin-right: 10px;
+}
+
+.command-box button {
+  background: #333;
+}
+.command-box {
+  margin-top: 30px;
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.command-box input {
+  width: 70%;
+  margin-right: 8px;
+}
+
+.command-response {
+  margin-top: 12px;
+  font-weight: bold;
+}
