@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 
-// Uses the deployed backend when VITE_API_URL is set,
-// otherwise the local FastAPI server
+// API location:
+// - VITE_API_URL if you set it (optional override)
+// - local development: FastAPI on port 8000, under /api
+// - deployed on Vercel: same domain, so just /api
 const API_URL = (
-  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? "http://127.0.0.1:8000/api" : "/api")
 ).replace(/\/$/, "");
 
 // Turn a FastAPI error response into readable text
